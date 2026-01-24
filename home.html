@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Home | Billing App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --bg:#0f2027;
+  --card:rgba(255,255,255,.12);
+  --text:#fff;
+}
+.light{
+  --bg:#f4f6f8;
+  --card:#fff;
+  --text:#000;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  font-family:Segoe UI, sans-serif;
+}
+
+.header{
+  text-align:center;
+  padding:30px;
+}
+
+.top-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 30px;
+}
+
+button{
+  padding:8px 16px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+}
+
+.container{
+  max-width:1000px;
+  margin:auto;
+}
+
+.card-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:30px;
+}
+
+.card{
+  background:var(--card);
+  padding:30px;
+  border-radius:20px;
+  text-align:center;
+  cursor:pointer;
+  transition:.3s;
+}
+.card:hover{ transform:translateY(-8px); }
+
+.logs{
+  margin:30px;
+  background:#fff;
+  color:#000;
+  padding:20px;
+  border-radius:16px;
+}
+</style>
+</head>
+
+<body>
+
+<script>
+if(localStorage.getItem("loggedIn")!=="true"){
+  location.href="login.html";
+}
+</script>
+
+<div class="top-bar">
+  <h3>Welcome, <span id="user"></span></h3>
+  <div>
+    <button onclick="toggleTheme()">🌙</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="header">
+  <h1>Billing Dashboard</h1>
+</div>
+
+<div class="container">
+  <div class="card-grid">
+    <div class="card" onclick="go('invoice.html')">🧾 Invoice Billing</div>
+    <div class="card" onclick="go('billing.html')">📦 Product List</div>
+  </div>
+</div>
+
+<div class="logs">
+  <h3>Last 5 Logins</h3>
+  <table width="100%">
+    <tbody id="logs"></tbody>
+  </table>
+</div>
+
+<script>
+user.innerText=localStorage.getItem("currentUser");
+
+function logout(){
+  localStorage.clear();
+  location.href="login.html";
+}
+
+function go(p){ location.href=p; }
+
+const logs=JSON.parse(localStorage.getItem("logins"))||[];
+logsEl=document.getElementById("logs");
+logsEl.innerHTML=logs.map(l=>`<tr><td>${l.name}</td><td>${l.time}</td></tr>`).join("");
+
+/* THEME */
+if(localStorage.getItem("theme")==="light"){
+  document.body.classList.add("light");
+}
+function toggleTheme(){
+  document.body.classList.toggle("light");
+  localStorage.setItem("theme",
+    document.body.classList.contains("light")?"light":"dark");
+}
+</script>
+
+</body>
+</html>

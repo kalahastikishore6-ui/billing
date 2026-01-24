@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login | Billing App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  font-family:Segoe UI, sans-serif;
+}
+.login-box{
+  width:360px;
+  padding:35px;
+  background:#fff;
+  border-radius:16px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.4);
+  text-align:center;
+}
+.login-box h2{ margin-bottom:20px; }
+.login-box input{
+  width:100%;
+  padding:14px;
+  margin:10px 0;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+.login-box button{
+  width:100%;
+  padding:14px;
+  margin-top:15px;
+  border:none;
+  border-radius:30px;
+  font-weight:bold;
+  background:#2563eb;
+  color:#fff;
+  cursor:pointer;
+}
+#error{ color:red; margin-top:10px; }
+</style>
+</head>
+
+<body>
+
+<div class="login-box">
+  <h2>Login</h2>
+  <input id="user" placeholder="Username">
+  <input id="pass" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <p id="error"></p>
+</div>
+
+<script>
+const users=[
+  {u:"lion",p:"8899",name:"kishore"},
+  {u:"rabbit",p:"9876",name:"nandhu"},
+  {u:"horse",p:"2233",name:"others"}
+];
+
+function login(){
+  const u=user.value.trim();
+  const p=pass.value.trim();
+  const found=users.find(x=>x.u===u && x.p===p);
+
+  if(!found){
+    error.innerText="Invalid credentials";
+    return;
+  }
+
+  localStorage.setItem("loggedIn","true");
+  localStorage.setItem("currentUser",found.name);
+
+  const logs=JSON.parse(localStorage.getItem("logins"))||[];
+  logs.unshift({name:found.name,time:new Date().toLocaleString()});
+  localStorage.setItem("logins",JSON.stringify(logs.slice(0,5)));
+
+  location.href="home.html";
+}
+</script>
+
+</body>
+</html>

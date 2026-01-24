@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GST Invoice</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin:0;
+  background:#f0f0f0;
+}
+.invoice-container {
+  width:210mm;
+  height:297mm;
+  margin:20px auto;
+  background:#fff;
+  padding:15mm;
+  box-sizing:border-box;
+  position:relative;
+  border:5px double #000;
+}
+
+/* HEADER */
+.header { text-align:center; font-weight:bold; }
+.header h2{ margin:4px 0; font-size:28px; }
+.company {
+  font-size:16px;
+  margin-bottom:15px;
+  line-height:1.2;
+}
+
+/* TOP FLEX INFO */
+.top-flex {
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+
+.left-top { width:65%; }
+.right-top { width:33%; }
+
+.left-top td, .right-top td { border:1px solid #000; padding:6px; vertical-align:top; }
+
+/* INPUTS */
+input, textarea { 
+  border:none; 
+  border-bottom:1px dotted #000; 
+  width:100%; 
+  font-size:14px; 
+  outline:none; 
+  box-sizing:border-box;
+}
+textarea { resize:none; overflow:hidden; }
+
+/* ITEMS TABLE */
+.items {
+  width:100%;
+  border-collapse: collapse;
+  margin-bottom:5mm;
+  table-layout:fixed;
+}
+.items th, .items td {
+  border:1px solid #000;
+  padding:6px;
+  text-align:center;
+  font-size:14px;
+  word-wrap:break-word;
+}
+
+
+
+/* BOTTOM SECTION */
+.bottom-section {
+  position:absolute;
+  bottom:10mm;
+  left:15mm;
+  width:calc(100% - 30mm);
+}
+
+/* BOXED GST + TOTAL */
+.gst-table {
+  width:42%;
+  float:right;
+  border-collapse:collapse;
+  margin-bottom:5mm;
+}
+.gst-table td, .gst-table th {
+  border:1px solid #000;
+  padding:8px;
+  text-align:left;
+  background:#f9f9f9;
+  font-size:14px;
+}
+
+/* LINES connecting bottom section */
+.bottom-section hr {
+  border:0;
+  border-top:1px solid #000;
+  margin:5px 0;
+}
+
+/* BOXED AMOUNT IN WORDS + SIGNATURE */
+.words-sign {
+  clear:both;
+  display:flex;
+  justify-content:space-between;
+  margin-top:5mm;
+}
+.words-sign > div {
+  border:1px solid #000;
+  padding:8px;
+  box-sizing:border-box;
+  min-height:4mm;
+  width:48%;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+}
+.words-sign .amount-words-box {
+  border-bottom:1px solid #000;
+  margin-bottom:5px;
+  height:10mm;
+}
+.words-sign .signature-box {
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+
+/* PRINT BUTTON */
+.print-button {
+  display:block;
+  width:150px;
+  margin:10px auto;
+  background:#2563eb;
+  color:#fff;
+  border:none;
+  padding:12px 0;
+  font-weight:bold;
+  border-radius:6px;
+  cursor:pointer;
+  box-shadow:0 4px 8px rgba(0,0,0,0.2);
+  transition:all 0.2s ease;
+}
+.print-button:hover{ background:#1d4ed8; transform:translateY(-1px);}
+.print-button:active{ transform:scale(0.97); }
+
+/* PRINT STYLE */
+@media print {
+  .print-button{ display:none; }
+  body{ background:#fff; }
+  .invoice-container{ width:210mm; height:270mm; padding:15mm; margin:0; box-sizing:border-box; }
+}
+</style>
+</head>
+<body>
+
+<div class="invoice-container">
+
+<!-- HEADER -->
+<div class="header">
+    <h3>TAX INVOICE</h3>
+  GSTIN No: <b>37XXXXXXXXXXZB</b>
+  
+  <div class="company">
+   <h3><b>SRI SORAKAYALA THATHA GUNNIES MERCHANT</b></h3>
+    <h4>#13, Chiranjeevi Centre, Narayanavanam – 517 581, Tirupati Dist, A.P.<br></h4>
+    <h4>Godown: #6-131, Main Road, Narayanavanam – 517 581, Tirupati Dist, A.P.</h4>
+  </div>
+</div>
+
+<!-- TOP FLEX INFO -->
+<div class="top-flex">
+  <table class="left-top">
+    <tr><td>To:<br><textarea rows="5"></textarea></td></tr>
+    <tr><td>GSTIN: <input></td></tr>
+  </table>
+  <table class="right-top">
+    <tr><td>Invoice No: <input></td></tr>
+    <tr><td>Date: <input type="date"></td></tr>
+    <tr><td>Vehicle No: <input></td></tr>
+  </table>
+</div>
+
+<!-- ITEMS -->
+<table class="items" id="items">
+<thead>
+<tr>
+  <th>S.No</th>
+  <th>Particulars</th>
+  <th>HSN</th>
+  <th>Qty</th>
+  <th>Rate</th>
+  <th>Amount</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<button onclick="addRow()" class="print-button">+ Add Item</button>
+
+<!-- BOTTOM SECTION -->
+<div class="bottom-section">
+  <hr>
+  <table class="gst-table">
+    <tr><td>Sub Total</td><td id="sub">0.00</td></tr>
+    <tr><td>CGST % <input id="cgst" oninput="calc()" style="width:50px"></td><td id="cgstAmt">0.00</td></tr>
+    <tr><td>SGST % <input id="sgst" oninput="calc()" style="width:50px"></td><td id="sgstAmt">0.00</td></tr>
+    <tr><td>IGST % <input id="igst" oninput="calc()" style="width:50px"></td><td id="igstAmt">0.00</td></tr>
+    <tr><th>Total Amount</th><th id="grand">0.00</th></tr>
+  </table>
+
+  <hr>
+  <div class="words-sign">
+    <div>
+      
+      Amount in Words:<br>
+      <b><span id="words"></span></b>
+    </div>
+    <div class="signature-box">
+      For Sri Sorakayala Thatha Gunnies Merchant<br><br><br><br>
+      Signature
+    </div>
+  </div>
+</div>
+
+</div>
+
+<footer>
+<button onclick="window.print()" class="print-button">🖨 Print Invoice</button>
+</footer>
+
+<script>
+let rowNo=0;
+function addRow(){
+  rowNo++;
+  document.querySelector("#items tbody").insertAdjacentHTML("beforeend",`
+  <tr>
+    <td>${rowNo}</td>
+    <td><input></td>
+    <td><input></td>
+    <td><input type="number" oninput="calc()"></td>
+    <td><input type="number" oninput="calc()"></td>
+    <td class="amt">0.00</td>
+  </tr>` );
+}
+addRow();
+
+function calc(){
+  let sub=0;
+  document.querySelectorAll("#items tbody tr").forEach(r=>{
+    let q=r.children[3].children[0].value||0;
+    let rate=r.children[4].children[0].value||0;
+    let amt=q*rate;
+    r.querySelector(".amt").innerText=amt.toFixed(2);
+    sub+=amt;
+  });
+  let cgst=+document.getElementById("cgst").value||0;
+  let sgst=+document.getElementById("sgst").value||0;
+  let igst=+document.getElementById("igst").value||0;
+  if(igst>0){ cgst=sgst=0; }
+  let cg=sub*cgst/100;
+  let sg=sub*sgst/100;
+  let ig=sub*igst/100;
+  document.getElementById("sub").innerText=sub.toFixed(2);
+  document.getElementById("cgstAmt").innerText=cg.toFixed(2);
+  document.getElementById("sgstAmt").innerText=sg.toFixed(2);
+  document.getElementById("igstAmt").innerText=ig.toFixed(2);
+  let grand=sub+cg+sg+ig;
+  document.getElementById("grand").innerText=grand.toFixed(2);
+  document.getElementById("words").innerText=toWords(grand);
+}
+
+function toWords(n){
+  const a=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten',
+  'Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+  const b=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+  if(n===0) return 'Zero Rupees Only';
+  function num(x){
+    if(x<20) return a[x];
+    if(x<100) return b[Math.floor(x/10)]+' '+a[x%10];
+    if(x<1000) return a[Math.floor(x/100)]+' Hundred '+num(x%100);
+    if(x<100000) return num(Math.floor(x/1000))+' Thousand '+num(x%1000);
+    if(x<10000000) return num(Math.floor(x/100000))+' Lakh '+num(x%100000);
+    return num(Math.floor(x/10000000))+' Crore '+num(x%10000000);
+  }
+  return num(Math.floor(n))+' Rupees Only';
+}
+</script>
+
+</body>
+</html>
