@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Client</title>
+    <style>
+        body {
+            background: #f4f6fb;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 500px;
+            margin: 60px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 32px 24px 24px 24px;
+        }
+        h1 {
+            text-align: center;
+            color: #2d3a4b;
+            margin-bottom: 24px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        input, textarea, button {
+            padding: 8px 12px;
+            border: 1px solid #cfd8dc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        button {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #125ea7;
+        }
+        .return-btn {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="return-btn" onclick="window.location='clients_list.html'">← Return to Clients</button>
+        <h1>Add Client</h1>
+        <form id="addClientForm">
+            <input type="text" id="clientName" placeholder="Client Name" required>
+            <input type="text" id="clientMobile" placeholder="Mobile Number">
+            <input type="email" id="clientEmail" placeholder="Email">
+            <input type="text" id="clientAddress" placeholder="Address">
+            <input type="text" id="clientDetails" placeholder="Extra Details">
+            <button type="submit">Add Client</button>
+        </form>
+    </div>
+    <script>
+        document.getElementById('addClientForm').onsubmit = function(e) {
+            e.preventDefault();
+            let clients = JSON.parse(localStorage.getItem('clients') || '[]');
+            const name = document.getElementById('clientName').value.trim();
+            const mobile = document.getElementById('clientMobile').value.trim();
+            const email = document.getElementById('clientEmail').value.trim();
+            const address = document.getElementById('clientAddress').value.trim();
+            const details = document.getElementById('clientDetails').value.trim();
+            if (!name) return;
+            clients.push({ name, mobile, email, address, details });
+            localStorage.setItem('clients', JSON.stringify(clients));
+            window.location = 'clients_list.html';
+        };
+    </script>
+</body>
+</html>

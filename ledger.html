@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ledger Book</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+        body {
+            background: #f4f6fb;
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 24px;
+        }
+        .return-btn {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        /* Client Profile Section */
+        .client-profile {
+            background: #e3eaf2;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 28px;
+        }
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 12px;
+        }
+        .client-info-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .client-field {
+            display: flex;
+            flex-direction: column;
+        }
+        .client-field label {
+            font-size: 0.95rem;
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .client-field input, .client-field textarea {
+            padding: 10px 12px;
+            border: 1px solid #cfd8dc;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        .client-field textarea {
+            min-height: 50px;
+            resize: vertical;
+        }
+        .client-field input[readonly], .client-field textarea[readonly] {
+            background: #fff;
+            color: #333;
+            border-color: #bbb;
+        }
+        .client-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .client-actions button {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        .client-actions button.danger {
+            background: #d32f2f;
+        }
+        /* Entry Form Section */
+        .entry-form {
+            background: #fff;
+            border: 1px solid #e3eaf2;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 28px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            font-size: 0.95rem;
+            color: #1976d2;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .form-group input, .form-group select {
+            padding: 10px 12px;
+            border: 1.5px solid #cfd8dc;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 4px rgba(25,118,210,0.2);
+        }
+        .form-group.hidden {
+            display: none;
+        }
+        .form-group.disabled input, .form-group.disabled select {
+            background: #f0f0f0;
+            color: #b0b0b0;
+            pointer-events: none;
+            border-color: #e0e0e0;
+        }
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .form-actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .form-actions .add-btn {
+            background: #388e3c;
+            color: #fff;
+        }
+        .form-actions .add-btn:hover {
+            background: #2e7d32;
+        }
+        .form-actions .reset-btn {
+            background: #999;
+            color: #fff;
+        }
+        /* Entries Section */
+        .entries-section {
+            margin-top: 28px;
+        }
+        .entry-card {
+            background: #f8f9f9;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 8px rgba(25,118,210,0.06);
+            transition: all 0.2s;
+        }
+        .entry-card:hover {
+            box-shadow: 0 4px 16px rgba(25,118,210,0.12);
+            transform: translateY(-2px);
+        }
+        .entry-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 12px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .entry-label {
+            font-size: 0.95rem;
+            color: #1976d2;
+            font-weight: 600;
+        }
+        .entry-value {
+            font-size: 1rem;
+            color: #333;
+        }
+        .entry-type {
+            padding: 4px px;
+            border-radius: 4px;
+            font-size: 0.85rem;   /* type of entry indicator */
+            font-weight: 600;
+        }
+        .entry-type.credit {
+            background: #d4edda;
+            color: #1b8a3a;
+        }
+        .entry-type.debit {
+            background: #f8d7da;
+            color: #d32f2f;
+        }
+        .entry-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .entry-actions button {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .entry-actions .edit-btn {
+            background: #1976d2;
+            color: #fff;
+        }
+        .entry-actions .edit-btn:hover {
+            background: #1256a3;
+        }
+        .entry-actions .delete-btn {
+            background: #d32f2f;
+            color: #fff;
+        }
+        .entry-actions .delete-btn:hover {
+            background: #b71c1c;
+        }
+        .entry-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            font-size: 0.95rem;
+        }
+        .entry-details  {
+            border-right: 1px solid #e3eaf2;
+            padding-right: 10px;
+        }
+        .entry-details .detail:last-child {
+            border-right: none;
+        }
+        .entry-details .detail.amount {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-right: none;
+        }
+        .entry-details .detail.amount .separator {
+            color: #cfd8dc;
+            font-weight: 600;
+        }
+
+        .detail-label {                 /* entries details label */
+            font-size: 0.85rem;
+            color: #999;
+            margin-bottom: 2px;
+            text-align: center;
+        }
+        .detail-value {
+            color: #333;
+            text-align: center;
+            font-weight: 500;
+        }
+        /* Balance Summary */
+        .balance-summary {
+            background: #f4f6fb;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
+            border-left: 4px solid #1976d2;
+        }
+        .balance-info {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .balance-item {
+            text-align: center;
+        }
+        .balance-item label {
+            font-size: 0.85rem;
+            color: #999;
+            font-weight: 600;
+        }
+        .balance-item .amount {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+        .balance-item .amount.positive {
+            color: #1b8a3a;
+        }
+        .balance-item .amount.negative {
+            color: #d32f2f;
+        }
+        .balance-item .amount.zero {
+            color: #1976d2;
+        }
+        @media (max-width: 700px) {
+            .container {
+                padding: 12px;
+            }
+            .entry-header {
+                grid-template-columns: 1fr auto;
+            }
+            .entry-details {
+                grid-template-columns: 1fr 1fr;
+            }
+            .entry-details .detail {
+                padding-right: 8px;
+            }
+        }
+        
+        
+
+            }
+
+        
+        
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="return-btn" onclick="window.location='clients_list.html'">← Return to Clients</button>
+
+        <!-- TOP: Client Profile Section -->
+        <div class="client-profile">
+            <div class="section-title">Client Details</div>
+            <div class="client-info-row">
+                <div class="client-field">
+                    <label>Name</label>
+                    <input type="text" id="clientName" readonly>
+                </div>
+                <div class="client-field">
+                    <label>Mobile</label>
+                    <input type="text" id="clientMobile" readonly>
+                </div>
+            </div>
+            <div class="client-info-row">
+                <div class="client-field">
+                    <label>Email</label>
+                    <input type="text" id="clientEmail" readonly>
+                </div>
+                <div class="client-field">
+                    <label>Address</label>
+                    <input type="text" id="clientAddress" readonly>
+                </div>
+            </div>
+            <div class="client-info-row full">
+                <div class="client-field">
+                    <label>Extra Details</label>
+                    <textarea id="clientDetails" readonly></textarea>
+                </div>
+            </div>
+            <div class="client-actions">
+                <button id="editProfileBtn">Edit</button>
+                <button class="danger" id="deleteProfileBtn">Delete</button>
+            </div>
+        </div>
+
+        <!-- MIDDLE: Entry Form Section -->
+        <div class="entry-form">
+            <div class="section-title">Add Entry</div>
+            <form id="entryForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Date *</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Entry Type *</label>
+                        <select id="entryType" required>
+                            <option value="">-- Select --</option>
+                            <option value="credit_product">Credit of Product</option>
+                            <option value="debit_product">Debit of Product</option>
+                            <option value="credit_payment">Credit of Payment</option>
+                            <option value="debit_payment">Debit of Payment</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Description *</label>
+                        <input type="text" id="desc" placeholder="Description" required>
+                    </div>
+                </div>
+
+                <!-- Product Fields -->
+                <div id="productFields">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Quantity *</label>
+                            <input type="number" id="qty" min="0" step="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Price *</label>
+                            <input type="number" id="price" min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label>Total (Qty × Price)</label>
+                            <input type="number" id="total" min="0" step="0.01" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Fields -->
+                <div id="paymentFields" class="form-group hidden">
+                    <label>Payment Amount *</label>
+                    <input type="number" id="payment" min="0" step="0.01">
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="add-btn">Add Entry</button>
+                    <button type="reset" class="reset-btn">Clear</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- BOTTOM: Entries (New to Old) -->
+        <div class="entries-section">
+            <div class="section-title">Entries (Newest First)</div>
+            <div class="balance-summary" id="balanceSummary">
+                <div class="balance-info">
+                    <div class="balance-item">
+                        <label>Current Balance</label>
+                        <div class="amount zero" id="currentBalance">₹0.00</div>
+                    </div>
+                </div>
+            </div>
+            <div id="entriesContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        let clientIndex = parseInt(new URLSearchParams(window.location.search).get('id') || '0');
+        let clients = JSON.parse(localStorage.getItem('clients') || '[]');
+        let client = clients[clientIndex] || {name:'Client Name', mobile:'', email:'', address:'', details:''};
+        let ledger = JSON.parse(localStorage.getItem('ledger_' + clientIndex) || '[]');
+
+        function loadClientFields(editable=false) {
+            document.getElementById('clientName').value = client.name || '';
+            document.getElementById('clientMobile').value = client.mobile || '';
+            document.getElementById('clientEmail').value = client.email || '';
+            document.getElementById('clientAddress').value = client.address || '';
+            document.getElementById('clientDetails').value = client.details || '';
+            ['clientName','clientMobile','clientEmail','clientAddress','clientDetails'].forEach(id => {
+                document.getElementById(id).readOnly = !editable;
+            });
+        }
+        loadClientFields(false);
+
+        let editing = false;
+        document.getElementById('editProfileBtn').onclick = function() {
+            if (!editing) {
+                loadClientFields(true);
+                this.textContent = 'Save';
+                editing = true;
+            } else {
+                client.name = document.getElementById('clientName').value;
+                client.mobile = document.getElementById('clientMobile').value;
+                client.email = document.getElementById('clientEmail').value;
+                client.address = document.getElementById('clientAddress').value;
+                client.details = document.getElementById('clientDetails').value;
+                clients[clientIndex] = client;
+                localStorage.setItem('clients', JSON.stringify(clients));
+                loadClientFields(false);
+                this.textContent = 'Edit';
+                editing = false;
+            }
+        };
+
+        document.getElementById('deleteProfileBtn').onclick = function() {
+            const pwd = prompt('Enter password to delete this client:');
+            if (pwd && pwd === localStorage.getItem('currentUserPassword')) {
+                if (confirm('Are you sure you want to delete this client?')) {
+                    clients.splice(clientIndex, 1);
+                    localStorage.setItem('clients', JSON.stringify(clients));
+                    localStorage.removeItem('ledger_' + clientIndex);
+                    window.location = 'clients_list.html';
+                }
+            } else if (pwd !== null) {
+                alert('Incorrect password.');
+            }
+        };
+
+        // Toggle fields based on entry type
+        document.getElementById('entryType').addEventListener('change', function() {
+            const type = this.value;
+            const productFields = document.getElementById('productFields');
+            const paymentFields = document.getElementById('paymentFields');
+
+            if (type === 'credit_product' || type === 'debit_product') {
+                productFields.style.display = 'block';
+                paymentFields.classList.add('hidden');
+            } else if (type === 'credit_payment' || type === 'debit_payment') {
+                productFields.style.display = 'none';
+                paymentFields.classList.remove('hidden');
+            }
+        });
+
+        // Auto-calculate total
+        document.getElementById('qty').addEventListener('input', calcTotal);
+        document.getElementById('price').addEventListener('input', calcTotal);
+        function calcTotal() {
+            const qty = parseFloat(document.getElementById('qty').value) || 0;
+            const price = parseFloat(document.getElementById('price').value) || 0;
+            document.getElementById('total').value = (qty * price).toFixed(2);
+        }
+
+        // Form submission
+        document.getElementById('entryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const date = document.getElementById('date').value;
+            const desc = document.getElementById('desc').value.trim();
+            const type = document.getElementById('entryType').value;
+
+            if (!date || !desc || !type) {
+                alert('Please fill all required fields.');
+                return;
+            }
+
+            let entry = { date, desc, type };
+
+            if (type === 'credit_product' || type === 'debit_product') {
+                const qty = document.getElementById('qty').value;
+                const price = document.getElementById('price').value;
+                const total = document.getElementById('total').value;
+                if (!qty || !price || !total) {
+                    alert('Please fill quantity, price, and total.');
+                    return;
+                }
+                entry.qty = parseFloat(qty);
+                entry.price = parseFloat(price);
+                entry.total = parseFloat(total);
+            } else if (type === 'credit_payment' || type === 'debit_payment') {
+                const payment = document.getElementById('payment').value;
+                if (!payment) {
+                    alert('Please enter payment amount.');
+                    return;
+                }
+                entry.payment = parseFloat(payment);
+            }
+
+            ledger.push(entry);
+            localStorage.setItem('ledger_' + clientIndex, JSON.stringify(ledger));
+            this.reset();
+            renderEntries();
+        });
+
+        function renderEntries() {
+            const container = document.getElementById('entriesContainer');
+            container.innerHTML = '';
+
+            let totalCredit = 0;
+            let totalDebit = 0;
+            let runningBalance = 0;
+
+            // Calculate totals first
+            for (let i = 0; i < ledger.length; i++) {
+                const entry = ledger[i];
+                if (entry.type === 'credit_product' || entry.type === 'credit_payment') {
+                    const amt = entry.total || entry.payment || 0;
+                    totalCredit += amt;
+                } else if (entry.type === 'debit_product' || entry.type === 'debit_payment') {
+                    const amt = entry.total || entry.payment || 0;
+                    totalDebit += amt;
+                }
+            }
+            runningBalance = totalCredit - totalDebit;
+
+            // Update balance summary
+            const balanceEl = document.getElementById('currentBalance');
+            balanceEl.textContent = '₹' + Math.abs(runningBalance).toFixed(2);
+            balanceEl.className = 'amount ' + (runningBalance > 0 ? 'positive' : runningBalance < 0 ? 'negative' : 'zero');
+
+            // Render entries (new to old)
+            runningBalance = 0;
+            for (let i = ledger.length - 1; i >= 0; i--) {
+                const entry = ledger[i];
+                const isProduct = entry.type.includes('product');
+                const isCredit = entry.type.includes('credit');
+
+                let amount = 0;
+                if (isProduct) {
+                    amount = entry.total || 0;
+                } else {
+                    amount = entry.payment || 0;
+                }
+
+                if (isCredit) {
+                    runningBalance += amount;
+                } else {
+                    runningBalance -= amount;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'entry-card';
+
+                let typeLabel = entry.type.replace('_', ' of ').toUpperCase();
+                let typeClass = isCredit ? 'credit' : 'debit';
+
+                let detailsHtml = '';
+                if (isProduct) {
+                    detailsHtml = `
+
+                        <div class="detail">
+                            <div class="detail-label">Quantity * price</div>
+                            <div class="detail-value">${entry.qty} * ₹${entry.price.toFixed(2)}</div>
+                         </div>
+
+
+                        <div>
+                                <div class="detail-label">Amount</div>
+                                <div class="detail-value">₹${entry.total.toFixed(2)}</div>
+                        </div>
+                    `;
+                } else {
+                    detailsHtml = `
+                        <div class="detail">
+                            <div class="detail-label">paid</div>
+                            </div>
+                            <div><div class="detail-label">Amount</div><div class="detail-value">₹${entry.payment.toFixed(2)}</div></div>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="entry-header">
+                        <div><span class="entry-label">Date:</span> <span class="entry-value">${entry.date}</span></div>
+                        <div><span class="entry-label">Description:</span> <span class="entry-value">${entry.desc}</span></div>
+                        <div class="entry-type ${typeClass}">${typeLabel}</div>
+                        <div class="entry-actions">
+                            <button class="edit-btn" onclick="editEntry(${i})">Edit</button>
+                            <button class="delete-btn" onclick="deleteEntry(${i})">Delete</button>
+                        </div>
+                    </div>
+                    <div class="entry-details">
+                        ${detailsHtml}
+                    </div>
+                `;
+                container.appendChild(card);
+            }
+        }
+
+        window.editEntry = function(idx) {
+            alert('Edit feature coming soon!');
+        };
+
+        window.deleteEntry = function(idx) {
+            if (confirm('Delete this entry?')) {
+                ledger.splice(idx, 1);
+                localStorage.setItem('ledger_' + clientIndex, JSON.stringify(ledger));
+                renderEntries();
+            }
+        };
+
+        renderEntries();
+    </script>
+</body>
+</html>

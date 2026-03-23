@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Clients List</title>
+	<style>
+		body {
+			background: #f4f6fb;
+			font-family: 'Segoe UI', Arial, sans-serif;
+			margin: 0;
+			padding: 0;
+		}
+		.container {
+			max-width: 1000px;
+			margin: 40px auto;
+			background: #fff;
+			border-radius: 12px;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+			padding: 32px 24px 24px 24px;
+		}
+		h1 {
+			text-align: center;
+			color: #2d3a4b;
+			margin-bottom: 24px;
+		}
+		.card-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+			gap: 24px;
+		}
+		.card {
+			background: #e3eaf2;
+			border-radius: 14px;
+			padding: 28px 20px;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+			cursor: pointer;
+			transition: transform 0.2s, box-shadow 0.2s;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+		}
+		.card:hover {
+			transform: translateY(-6px) scale(1.03);
+			box-shadow: 0 6px 18px rgba(25, 118, 210, 0.10);
+		}
+		.card-title {
+			font-size: 1.2rem;
+			font-weight: bold;
+			color: #1976d2;
+			margin-bottom: 8px;
+		}
+		.card-details {
+			color: #444;
+			font-size: 1rem;
+			margin-bottom: 10px;
+		}
+		.add-client {
+			margin-bottom: 24px;
+			display: flex;
+			gap: 10px;
+		}
+		.add-client input {
+			padding: 8px 12px;
+			border: 1px solid #cfd8dc;
+			border-radius: 4px;
+			font-size: 1rem;
+		}
+		.add-client button {
+			background: #1976d2;
+			color: #fff;
+			border: none;
+			border-radius: 4px;
+			padding: 8px 16px;
+			font-size: 1rem;
+			cursor: pointer;
+		}
+		@media (max-width: 600px) {
+			.container { padding: 10px; }
+			.card { padding: 18px 8px; }
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<button class="return-btn" onclick="window.location='home.html'">← Return to Home</button>
+		<h1>Clients</h1>
+		<button style="margin-bottom:18px;background:#43a047;color:#fff;padding:10px 20px;border:none;border-radius:4px;font-size:1rem;cursor:pointer;" onclick="window.location='add_client.html'">+ Add a Client</button>
+		<input type="text" id="searchBox" placeholder="Search clients..." style="width:100%;padding:8px 12px;margin-bottom:18px;border:1px solid #cfd8dc;border-radius:4px;font-size:1rem;">
+		<div class="card-grid" id="clientGrid">
+			<!-- Client cards will be rendered here -->
+		</div>
+	</div>
+	<script>
+				let clients = JSON.parse(localStorage.getItem('clients') || '[]');
+				function renderClients(filter = '') {
+						const grid = document.getElementById('clientGrid');
+						grid.innerHTML = '';
+						clients.forEach((c, i) => {
+								const searchString = [c.name, c.mobile, c.email, c.address, c.details].filter(Boolean).join(' ').toLowerCase();
+								if (filter && !searchString.includes(filter.toLowerCase())) return;
+								const card = document.createElement('div');
+								card.className = 'card';
+								card.onclick = () => { window.location = `ledger.html?id=${i}`; };
+								card.innerHTML = `
+									<div class='card-title'>${c.name}</div>
+									<div class='card-details'>
+										${c.mobile ? '📱 ' + c.mobile + '<br>' : ''}
+										${c.email ? '✉️ ' + c.email + '<br>' : ''}
+										${c.address ? '🏠 ' + c.address + '<br>' : ''}
+										${c.details || ''}
+									</div>`;
+								grid.appendChild(card);
+						});
+				}
+				document.getElementById('searchBox').oninput = function() {
+						renderClients(this.value);
+				};
+				window.onload = () => renderClients();
+	</script>
+</body>
+</html>
